@@ -37,7 +37,7 @@ class DeleteConsumerGroup extends Component {
             this.setState({
                 modal: false
             }, this.props.onComplete)
-        }, err => toast.error(`Failed to delete consumer group ${err.message}`))
+        }, err => toast.error(`Failed ${err.message}`))
     };
 
     render() {

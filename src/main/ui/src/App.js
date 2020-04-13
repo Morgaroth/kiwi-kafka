@@ -21,6 +21,7 @@ import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import * as ApiService from "./services/ApiService";
 import ClusterChooser from "./pages/common/ClusterChooser";
+import KafkaTopicRecordAnalysis from "./pages/topicrecords/KafkaTopicRecordAnalysis";
 
 class App extends Component {
     constructor(props) {
@@ -82,22 +83,25 @@ class App extends Component {
                             <Collapse navbar>
                                 <Nav className="ml-0" navbar>
                                     <NavItem>
-                                        <NavLink tag={Link} to="/" replace={true} >Kafka Brokers</NavLink>
+                                        <NavLink tag={Link} to="/" replace={true} >Brokers</NavLink>
                                     </NavItem>
                                     <NavItem>
-                                        <NavLink tag={Link} to="/topics" replace={true} >Kafka Topics</NavLink>
+                                        <NavLink tag={Link} to="/topics" replace={true} >Topics</NavLink>
                                     </NavItem>
                                     <NavItem>
-                                        <NavLink tag={Link} to="/groups" replace={true} >Kafka Consumers Groups</NavLink>
+                                        <NavLink tag={Link} to="/groups" replace={true} >Consumers Groups</NavLink>
                                     </NavItem>
                                     <NavItem>
-                                        <NavLink tag={Link} to="/post" replace={true} >Kafka Post</NavLink>
+                                        <NavLink tag={Link} to="/post" replace={true} >Produce</NavLink>
                                     </NavItem>
                                     <NavItem>
-                                        <NavLink tag={Link} to="/get" replace={true} >Kafka Get</NavLink>
+                                        <NavLink tag={Link} to="/get" replace={true} >Consume</NavLink>
                                     </NavItem>
                                     <NavItem>
-                                        <NavLink tag={Link} to="/download" replace={true} >Kafka Download</NavLink>
+                                        <NavLink tag={Link} to="/download" replace={true} >Download</NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink tag={Link} to="/analysis" replace={true} >Record Analysis</NavLink>
                                     </NavItem>
                                 </Nav>
                                 <Nav className="ml-auto" navbar>
@@ -129,6 +133,7 @@ class App extends Component {
                             <Route path="/post" component={props => <KafkaPost {...props} profiles={this.state.profiles}/> } />
                             <Route path="/get" component={props => <KafkaGet {...props} isDownload={false} profiles={this.state.profiles}/>} />
                             <Route path="/download" component={props => <KafkaGet {...props} isDownload={true} profiles={this.state.profiles}/>} />
+                            <Route path="/analysis" component={props => <KafkaTopicRecordAnalysis {...props} profiles={this.state.profiles}/> } />
                             <Route redirectTo="/"/>
                         </Switch>
                     </div>

@@ -91,7 +91,7 @@ class FileDownloader extends Component {
             this.state.format,
             this.state.buttons.filter(b => this.state[b.key]).map(b => b.displayName.toUpperCase()),
             this.state.separator,
-            () => toast.error("Failed to download data to file"));
+            (err) => toast.error(`Failed to download data to file ${err.message}`));
     };
 
     render() {

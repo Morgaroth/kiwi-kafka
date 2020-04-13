@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {Button, ButtonGroup, InputGroupAddon, InputGroupText, Spinner, Table} from "reactstrap";
+import {Alert, Button, ButtonGroup, InputGroupAddon, InputGroupText, Spinner, Table} from "reactstrap";
 import {MdRefresh} from "react-icons/md";
 import {toast} from "react-toastify";
 import * as ApiService from "../../../services/ApiService";
@@ -13,7 +13,8 @@ class ConsumerGroupDetailsView extends Component {
 
         this.state = {
             groupData: {},
-            loading: true
+            loading: true,
+            deleted: false
         }
     }
 
@@ -25,6 +26,12 @@ class ConsumerGroupDetailsView extends Component {
     componentWillUnmount() {
         this.mounted = false;
     }
+
+    onDelete = () => {
+        this.setState({
+            deleted: true
+        }, this.props.onDeletion())
+    };
 
     loadConsumerDetails = () => {
         this.setState({
@@ -42,12 +49,12 @@ class ConsumerGroupDetailsView extends Component {
             }
         }, (err) => {
             this.setState({loading:false});
-            toast.error(`Error retreiving ${this.props.groupId} group info: ${err.message}`)
+            toast.error(`Error retrieving ${this.props.groupId} group info: ${err.message}`)
         })
     };
 
     render() {
-        return (
+        return this.state.deleted ? (<Alert color="warning">Consumer Group has been marked for deletion</Alert>) : (
             <div>
                 <div className={"TwoGap"} />
                 <ButtonGroup>
@@ -57,7 +64,7 @@ class ConsumerGroupDetailsView extends Component {
                     <Button color="primary" onClick={this.loadConsumerDetails}>Refresh <MdRefresh/></Button>
                     {/*<Button color="warning" disabled>Reset to Latest</Button>*/}
                     {/*<Button color="warning" disabled>Reset to Earliest</Button>*/}
-                    <DeleteConsumerGroup onComplete={this.props.onDeletion} groupId={this.props.groupId} profiles={this.props.profiles}/>
+                    <DeleteConsumerGroup onComplete={this.onDelete} groupId={this.props.groupId} profiles={this.props.profiles}/>
                 </ButtonGroup>
 
 
@@ -81,7 +88,7 @@ class ConsumerGroupDetailsView extends Component {
 
 
                         { Object.entries(this.state.groupData)
-                            .filter(([topic, data]) => !this.props.topics || this.props.topics.includes(topic))
+                            .filter(([topic]) => !this.props.topics || this.props.topics.includes(topic))
                             .map(([topic, data]) => {
                                 return (
                                     <tbody key={`${encodeURIComponent(this.props.groupId)}_${topic}`}>

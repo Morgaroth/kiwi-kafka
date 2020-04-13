@@ -19,11 +19,16 @@ const errorHandler = (error) => {
 };
 
 const statusHandler = (response) => {
-    if (response.ok) {
-        return response;
-    } else {
-        throw new Error(`${response.status} Error response from Server`);
-    }
+    return new Promise((resolve, reject) => {
+        if (response.ok) {
+            return resolve(response);
+        } else {
+            return response.json()
+                .then(result => {
+                    reject(Error(`${response.status} Error response from Server ${result.message || 'Unknown'}`))
+                })
+        }
+    });
 };
 
 export const getVersion = (cb, eb) => {

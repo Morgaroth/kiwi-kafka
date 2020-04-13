@@ -43,7 +43,7 @@ class TopicInput extends Component {
                         topicList:topics
                     });
                 }
-            }, () => toast.warn("Could not retrieve topic list from server"));
+            }, (err) => toast.warn(`Could not retrieve topic list ${err.message}`));
         }
     };
 

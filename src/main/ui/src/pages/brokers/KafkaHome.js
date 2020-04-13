@@ -23,7 +23,7 @@ class KafkaHome extends Component {
                     brokers:brokers
                 });
             }
-        }, () => toast.error("Could not retrieve broker list from server"));
+        }, (err) => toast.error(`Could not retrieve broker list ${err.message}`));
     }
 
     componentWillUnmount() {
@@ -37,7 +37,7 @@ class KafkaHome extends Component {
                 activeNode: id
             });
             toast.info("Retrieved Log files for broker " + id)
-        }, () => toast.error("Could not retrieve Log files for broker " + id))
+        }, (err) => toast.error(`Could not retrieve Log files ${id} ${err.message}`))
     };
 
     //TODO Improve display of this data

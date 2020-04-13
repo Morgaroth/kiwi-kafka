@@ -8,7 +8,8 @@ import {MdRefresh} from "react-icons/md";
 import * as ApiService from "../../services/ApiService";
 import {toast} from "react-toastify";
 import SearchableViewList from "../common/SearchableViewList";
-import ConsumerGroupView from "./components/ConsumerGroupView";
+import PropTypes from "prop-types";
+import ConsumerGroupDetailsView from "./components/ConsumerGroupDetailsView";
 
 class KafkaConsumerGroups extends Component {
 
@@ -18,7 +19,7 @@ class KafkaConsumerGroups extends Component {
         this.state = {
             groupList: [],
             loading: false,
-            ignoreKiwiConsumers: true
+            activeElement: null
         };
     }
 
@@ -29,7 +30,7 @@ class KafkaConsumerGroups extends Component {
 
     componentWillUnmount(){
         this.mounted = false;
-    };
+    }
 
     loadConsumerGroups = () => {
         this.setState({
@@ -44,15 +45,21 @@ class KafkaConsumerGroups extends Component {
                         toast.info("Refreshed consumer group list from server");
                     });
                 }
-            }, () => {
+            }, (err) => {
                 if(this.mounted){
                     this.setState({
                         loading: false
                     });
-                    toast.error("Could not retrieve consumer group list from server")
+                    toast.error(`Could not retrieve consumer group list ${err.message}`)
                 }
             });
         });
+    };
+
+    setActiveElement = (element) => {
+        this.setState({
+            activeElement: element
+        })
     };
 
     render() {
@@ -62,22 +69,33 @@ class KafkaConsumerGroups extends Component {
                 <div className="mt-lg-4"/>
                 <h1>Kafka Consumer Groups</h1>
                 <div className="mt-lg-4"/>
-                <div className={"TwoGap"}/>
 
+                {this.state.activeElement === null ?
+                    <div>
+                        <div className={"TwoGap"}/>
 
-                <Button color="primary" onClick={this.loadConsumerGroups}>Reload List <MdRefresh/></Button>
+                        <Button color="primary" onClick={this.loadConsumerGroups}>Reload List <MdRefresh/></Button>
 
-                <div className={"Gap"}/>
+                        <div className={"Gap"}/>
+                    </div> : null
+                }
+
                 {this.state.loading ? <Spinner color="secondary"/> : ''}
 
                 <div className={"Gap"}/>
 
                 <SearchableViewList elementList={this.state.groupList}
-                                    elementViewProvider={(group) => <ConsumerGroupView key={`${group}_search`} groupId={group} onDeletion={this.loadConsumerGroups} profiles={this.props.profiles}/> } />
+                                    elementViewProvider={(group) => <ConsumerGroupDetailsView groupId={group} onDeletion={this.loadConsumerGroups} profiles={this.props.profiles}/>}
+                                    setActiveElement={this.setActiveElement}
+                />
             </Container>
         );
     }
-
 }
+
+KafkaConsumerGroups.propTypes = {
+    profiles: PropTypes.array.isRequired
+};
+
 
 export default KafkaConsumerGroups;

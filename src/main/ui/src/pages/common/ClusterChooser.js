@@ -36,7 +36,7 @@ class ClusterChooser extends Component {
                 })
             }
 
-        }, () => toast.error("No connection to server"));
+        }, (err) => toast.error(`No connection to server ${err.message}`));
     }
 
     toggleCluster = () => {
