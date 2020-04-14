@@ -3,7 +3,7 @@ package com.github.domwood.kiwi.kafka.task.config;
 import com.github.domwood.kiwi.data.output.CreateTopicConfigOptions;
 import com.github.domwood.kiwi.data.output.ImmutableCreateTopicConfigOptions;
 import com.github.domwood.kiwi.kafka.resources.KafkaTopicConfigResource;
-import com.github.domwood.kiwi.kafka.task.FuturisingAbstractKafkaTask;
+import com.github.domwood.kiwi.kafka.task.FuturisingKafkaTask;
 import org.apache.kafka.common.config.TopicConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CreateTopicConfig extends FuturisingAbstractKafkaTask<Void, CreateTopicConfigOptions, KafkaTopicConfigResource> {
+public class CreateTopicConfig extends FuturisingKafkaTask<Void, CreateTopicConfigOptions, KafkaTopicConfigResource> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

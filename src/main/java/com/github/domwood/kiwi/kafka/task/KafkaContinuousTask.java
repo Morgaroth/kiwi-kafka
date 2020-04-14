@@ -13,4 +13,6 @@ public interface KafkaContinuousTask<I, O> extends Closeable {
 
     public boolean isClosed();
 
+    public boolean isPaused();
+
 }

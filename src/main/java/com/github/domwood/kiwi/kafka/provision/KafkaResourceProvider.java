@@ -2,11 +2,14 @@ package com.github.domwood.kiwi.kafka.provision;
 
 import com.github.domwood.kiwi.kafka.configs.KafkaConfigManager;
 import com.github.domwood.kiwi.kafka.resources.*;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.BytesDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.Properties;
 
 @Component
 public class KafkaResourceProvider {
@@ -15,6 +18,12 @@ public class KafkaResourceProvider {
 
     public KafkaResourceProvider(KafkaConfigManager configManager) {
         this.configManager = configManager;
+    }
+
+    public KafkaConsumerResource<String, byte[]> kafkaByteConsumerResource(Optional<String> clusterName) {
+        Properties props = configManager.generateConsumerConfig(clusterName);
+        props.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, BytesDeserializer.class.getName());
+        return new KafkaConsumerResource<>(props);
     }
 
     public KafkaConsumerResource<String, String> kafkaStringConsumerResource(Optional<String> clusterName) {

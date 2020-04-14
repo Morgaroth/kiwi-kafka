@@ -61,12 +61,12 @@ Run:
 
 There are various ways this can be started locally, this is my preferred method:
 
- - Run `./run-docker.sh`
- - Start KiwiApplication or via `mvn spring-boot:run`
- - Run `./run-node-server.sh`
+ - Run `./run-docker.sh` in the scripts folder
+ - Start KiwiApplication in an idea or via `mvn spring-boot:run`
+ - Run `./run-node-server.sh` in the scripts folder
  - Go to `localhost:3000` to see UI
  
-Editing should javascript should lead to live updates of the UI at `localhost:3000`.
+Editing javascript should lead to live updates of the UI at `localhost:3000`.
 The UI will also be available at `localhost:8080` or whatever port you have set `server.port` to.
 But this will not update automatically when making changes.
   

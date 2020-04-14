@@ -11,7 +11,7 @@ import "../../App.css";
 import {MdRefresh} from "react-icons/md";
 import SearchableViewList from "../common/SearchableViewList";
 import PropTypes from "prop-types";
-import TopicRecordAnalysis from "./components/TopicRecordAnalysis";
+import TopicRecordAnalysisView from "./components/TopicRecordAnalysisView";
 
 class KafkaTopicRecordAnalysis extends Component {
 
@@ -19,7 +19,8 @@ class KafkaTopicRecordAnalysis extends Component {
         super(props);
         this.state = {
             topicList: [],
-            loading: false
+            loading: false,
+            activeElement: null
         };
     }
 
@@ -37,10 +38,10 @@ class KafkaTopicRecordAnalysis extends Component {
             loading: true
         }, () => {
             ApiService.getTopics((topics) => {
-                if(this.mounted){
+                if (this.mounted) {
                     this.setState({
                         topicList: topics || [],
-                        loading:false
+                        loading: false
                     }, () => {
                         toast.info("Refreshed topic list from server");
                     });
@@ -60,6 +61,12 @@ class KafkaTopicRecordAnalysis extends Component {
         })
     };
 
+    setActiveElement = (element) => {
+        this.setState({
+            activeElement: element
+        })
+    };
+
     render() {
         return (
             <Container className={"WideBoi"}>
@@ -69,15 +76,25 @@ class KafkaTopicRecordAnalysis extends Component {
                 <div className="mt-lg-4"/>
                 <div className={"TwoGap"}/>
 
-                <ButtonGroup>
-                    <Button color="primary" onClick={this.reloadTopics}>Reload List <MdRefresh/></Button>
-                    {this.state.loading ? <Spinner color="secondary"/> : ''}
-                </ButtonGroup>
+                {this.state.activeElement === null ?
+                    <div>
+                        <ButtonGroup>
+                            <Button color="primary" onClick={this.reloadTopics}>Reload List <MdRefresh/></Button>
+                            {this.state.loading ? <Spinner color="secondary"/> : ''}
+                        </ButtonGroup>
 
-                <div className={"Gap"}/>
+                        <div className={"Gap"}/>
+
+
+                    </div>
+                    : null}
 
                 <SearchableViewList elementList={this.state.topicList}
-                                    elementViewProvider={(topic) => <TopicRecordAnalysis key={`${topic}_record_analysis`} profiles={this.props.profiles} topic={topic}/> } />
+                                    elementViewProvider={(topic) => <TopicRecordAnalysisView
+                                        key={`${topic}_record_analysis`} profiles={this.props.profiles}
+                                        topic={topic}/>}
+                                    setActiveElement={this.setActiveElement}
+                />
             </Container>
         );
     }

@@ -7,7 +7,7 @@ import com.github.domwood.kiwi.data.output.ImmutableConsumedMessage;
 import com.github.domwood.kiwi.data.output.ImmutableConsumerResponse;
 import com.github.domwood.kiwi.kafka.filters.FilterBuilder;
 import com.github.domwood.kiwi.kafka.resources.KafkaConsumerResource;
-import com.github.domwood.kiwi.kafka.task.FuturisingAbstractKafkaTask;
+import com.github.domwood.kiwi.kafka.task.FuturisingKafkaTask;
 import com.github.domwood.kiwi.kafka.task.KafkaTaskUtils;
 import com.github.domwood.kiwi.kafka.utils.KafkaConsumerTracker;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -27,7 +27,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.stream.Collectors.toList;
 
 
-public class BasicConsumeMessages extends FuturisingAbstractKafkaTask<AbstractConsumerRequest, ConsumerResponse<String, String>, KafkaConsumerResource<String, String>> {
+public class BasicConsumeMessages extends FuturisingKafkaTask<AbstractConsumerRequest, ConsumerResponse<String, String>, KafkaConsumerResource<String, String>> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

@@ -6,8 +6,8 @@ import com.github.domwood.kiwi.data.input.filter.MessageFilter;
 import com.github.domwood.kiwi.data.output.*;
 import com.github.domwood.kiwi.kafka.filters.FilterBuilder;
 import com.github.domwood.kiwi.kafka.resources.KafkaConsumerResource;
-import com.github.domwood.kiwi.kafka.task.FuturisingAbstractKafkaTask;
-import com.github.domwood.kiwi.kafka.task.KafkaContinuousTask;
+import com.github.domwood.kiwi.kafka.task.ContinousFuturisingKafkaTask;
+import com.github.domwood.kiwi.kafka.task.FuturisingKafkaTask;
 import com.github.domwood.kiwi.kafka.task.KafkaTaskUtils;
 import com.github.domwood.kiwi.kafka.utils.KafkaConsumerTracker;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static com.github.domwood.kiwi.kafka.utils.KafkaUtils.fromKafkaHeaders;
@@ -29,39 +27,19 @@ import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class ContinuousConsumeMessages
-        extends FuturisingAbstractKafkaTask<AbstractConsumerRequest, Void, KafkaConsumerResource<String, String>>
-        implements KafkaContinuousTask<AbstractConsumerRequest, ConsumerResponse<String, String>>{
+        extends ContinousFuturisingKafkaTask<AbstractConsumerRequest, ConsumerResponse<String, String>, KafkaConsumerResource<String, String>> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final Integer BATCH_SIZE = 100;
     private static final Integer MAX_MESSAGES = 500;
     private static final Integer MAX_MESSAGE_BYTES = 500 * 2000 * 16;
 
-    private final AtomicBoolean closed;
-    private final AtomicBoolean paused;
-
-    private Consumer<ConsumerResponse<String, String>> consumer;
     private volatile List<MessageFilter> filters;
 
     public ContinuousConsumeMessages(KafkaConsumerResource<String, String> resource,
-                                     AbstractConsumerRequest input){
+                                     AbstractConsumerRequest input) {
         super(resource, input);
-
-        this.consumer = message -> logger.warn("No consumer attached to kafka task");
-        this.paused = new AtomicBoolean(false);
-        this.closed = new AtomicBoolean(false);
         this.filters = emptyList();
-    }
-
-    @Override
-    public void close() {
-        logger.info("Task set to close, closing...");
-        this.closed.set(true);
-    }
-
-    @Override
-    public void pause() {
-        this.paused.set(true);
     }
 
     @Override
@@ -70,26 +48,20 @@ public class ContinuousConsumeMessages
     }
 
     @Override
-    public void registerConsumer(Consumer<ConsumerResponse<String, String>> consumer) {
-        this.consumer = consumer;
-    }
-
-    @Override
     protected Void delegateExecuteSync() {
         this.filters = input.filters();
 
-        try{
+        try {
             KafkaConsumerTracker tracker = KafkaTaskUtils.subscribeAndSeek(resource, input.topics(), input.consumerStartPosition());
 
             forward(emptyList(), tracker.position(resource));
 
             int idleCount = 0;
-            while(!this.isClosed()) {
-                if(this.paused.get()){
+            while (!this.isClosed()) {
+                if (this.isPaused()) {
                     MILLISECONDS.sleep(20);
-                }
-                else{
-                    ConsumerRecords<String, String> records = resource.poll(Duration.of(Integer.max(10^(idleCount+1), 5000), MILLIS));
+                } else {
+                    ConsumerRecords<String, String> records = resource.poll(Duration.of(Integer.max(10 ^ (idleCount + 1), 5000), MILLIS));
                     if (records.isEmpty()) {
                         idleCount++;
                         logger.debug("No records polled for topic {} ", input.topics());
@@ -125,24 +97,22 @@ public class ContinuousConsumeMessages
             }
 
             this.resource.unsubscribe();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             logger.error("Error occurred during continuous kafka consuming", e);
         }
         logger.info("Task has completed");
         return null;
     }
 
-    private void logCommit(Map<TopicPartition, OffsetAndMetadata> offsetData, Exception exception){
-        if(exception != null){
+    private void logCommit(Map<TopicPartition, OffsetAndMetadata> offsetData, Exception exception) {
+        if (exception != null) {
             logger.error("Failed to commit offset ", exception);
-        }
-        else{
+        } else {
             logger.debug("Commit offset data {}", offsetData);
         }
     }
 
-    private ConsumedMessage<String, String> asConsumedRecord(ConsumerRecord<String, String> record){
+    private ConsumedMessage<String, String> asConsumedRecord(ConsumerRecord<String, String> record) {
         return ImmutableConsumedMessage.<String, String>builder()
                 .timestamp(record.timestamp())
                 .offset(record.offset())
@@ -156,14 +126,14 @@ public class ContinuousConsumeMessages
     private void forwardAndMaybeCommit(KafkaConsumerResource<String, String> resource,
                                        List<ConsumedMessage<String, String>> messages,
                                        Map<TopicPartition, OffsetAndMetadata> toCommit,
-                                       ConsumerPosition position){
+                                       ConsumerPosition position) {
         //Blocking Call
         logger.info("Message batch size {} forwarding to consumers", messages.size());
 
-        if(!this.isClosed()){
+        if (!this.isClosed()) {
             forward(messages, position);
 
-            if(resource.isCommittingConsumer()){
+            if (resource.isCommittingConsumer()) {
                 resource.commitAsync(toCommit, this::logCommit);
             }
 
@@ -173,18 +143,13 @@ public class ContinuousConsumeMessages
     }
 
     private void forward(List<ConsumedMessage<String, String>> messages,
-                         ConsumerPosition position){
-        if(!this.isClosed()){
-            this.consumer.accept(ImmutableConsumerResponse.<String, String>builder()
+                         ConsumerPosition position) {
+        if (!this.isClosed()) {
+            this.forward(ImmutableConsumerResponse.<String, String>builder()
                     .messages(messages)
                     .position(position)
                     .build());
         }
-    }
-
-    @Override
-    public boolean isClosed() {
-        return this.closed.get();
     }
 
 }
