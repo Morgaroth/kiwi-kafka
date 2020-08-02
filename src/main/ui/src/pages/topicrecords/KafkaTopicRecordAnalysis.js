@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import {
+    Badge,
     Button,
     ButtonGroup,
     Container,
@@ -72,6 +73,7 @@ class KafkaTopicRecordAnalysis extends Component {
             <Container className={"WideBoi"}>
 
                 <div className="mt-lg-4"/>
+                <h4><Badge color="info" pill>Experimental</Badge></h4>
                 <h1>Kafka Topic Record Analysis</h1>
                 <div className="mt-lg-4"/>
                 <div className={"TwoGap"}/>

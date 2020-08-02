@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {Button, Pagination, PaginationItem, PaginationLink, Table} from "reactstrap";
+import {Button, Pagination, PaginationItem, PaginationLink, Table, Tooltip} from "reactstrap";
 import TopicDensityBar from "./TopicDensityBar";
 
 class TopicRecordAnalysisView extends Component {
@@ -157,7 +157,7 @@ class TopicRecordAnalysisView extends Component {
                     <tbody>
                     <tr>
                         <td>
-                            <label><b>Record/Offset Density Chart </b></label>(Average records per offset, between min/max offset)
+                            <label><b>Record/Offset Density Chart </b></label> (Average records per offset, between min/max offset)
                         </td>
                     </tr>
                     <tr>
@@ -183,7 +183,6 @@ class TopicRecordAnalysisView extends Component {
                     </tr>
                     </tbody>
                 </Table>
-
             </div>
         )
     }
