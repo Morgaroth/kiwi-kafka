@@ -33,10 +33,10 @@ class TopicDensityBar extends Component {
 
                 }
                 {
-                    // this.props.data.ranges.map((range, index) => (
-                    //     <Tooltip key={"ttp_" + this.props.number + "_" + index} placement="bottom"
-                    //     isOpen={this.state.toolTipToggle} toggle={this.toggleToolTip} target={"pg_"+ this.props.number + "_" + index} />
-                    // )
+                    this.props.data.ranges.map((range, index) => (
+                        <Tooltip key={"ttp_" + this.props.number + "_" + index} placement="bottom"
+                        isOpen={this.state.toolTipToggle} toggle={this.toggleToolTip} target={"pg_"+ this.props.number + "_" + index} />
+                    ))
                 }
                 <Progress barClassName={"bg-heatmap-white"} bar key={"post"} value={10}>{this.props.stopBar}</Progress>
             </Progress>
